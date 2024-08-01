@@ -29,4 +29,15 @@ class BlogModel(models.Model):
         verbose_name_plural = 'Blogs'
 
 
+class UserConfirmationModel(models.Model):
+    code = models.IntegerField()
+    email = models.EmailField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.email} - {self.code}'
+
+    class Meta:
+        verbose_name = 'code'
+        verbose_name_plural = 'codes'
 
