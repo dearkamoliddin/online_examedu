@@ -1,5 +1,4 @@
 import random
-
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
@@ -7,7 +6,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView, View
 from conf.settings import EMAIL_HOST_USER
 from blog.forms import RegistrationForm, LoginForm
 from blog.models import BlogModel, UserConfirmationModel
@@ -83,26 +82,32 @@ def send_confirmation_email(email):
         return False
 
 
-def register_view(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password1'])
-            user.is_active = False
-            user.save()
-            if send_confirmation_email(email=form.cleaned_data['email']):
-                return render(request, 'auth/confirmation.html')
-            else:
-                return redirect('blog:home')
+class RegisterView(FormView):
+    template_name = 'auth/register.html'
+    form_class = RegistrationForm
+    success_url = reverse_lazy('blog:home')
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data['password1'])
+        user.is_active = False
+        user.save()
+        email = form.cleaned_data['email']
+        if send_confirmation_email(email=email):
+            return super().form_valid(form)
         else:
-            return HttpResponse(form.errors)
-    else:
-        return render(request, 'auth/register.html')
+            return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
 
 
-def login_view(request):
-    if request.method == 'POST':
+class LoginView(View):
+    def get(self, request, *args, **kwargs):
+        form = LoginForm()
+        return render(request, 'auth/login.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
         form = LoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
@@ -112,11 +117,8 @@ def login_view(request):
                 login(request, user)
                 return redirect('blog:home')
             else:
-                return render(request, 'auth/login.html')
-        else:
-            return render(request, 'auth/login.html')
-
-    return render(request, 'auth/login.html')
+                form.add_error(None, 'Invalid username or password.')
+        return render(request, 'auth/login.html', {'form': form})
 
 
 def confirmation_view(request):
@@ -134,13 +136,22 @@ def confirmation_view(request):
         return render(request, 'auth/confirmation.html')
 
 
-def logout_view(request):
-    logout(request)
-    return redirect('blog:home')
+class LogoutView(View):
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('blog:home')
 
 
-def send_email(request):
-    if request.method == "POST":
+class SendEmailView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'contact.html')
+
+    def post(self, request, *args, **kwargs):
+        subject = request.POST.get("subject")
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [request.POST.get("email")]
+        message = request.POST.get("message")
+
         with get_connection(
                 host=settings.EMAIL_HOST,
                 port=settings.EMAIL_PORT,
@@ -148,11 +159,7 @@ def send_email(request):
                 password=settings.EMAIL_HOST_PASSWORD,
                 use_tls=settings.EMAIL_USE_TLS
         ) as connection:
-            subject = request.POST.get("subject")
-            email_from = settings.EMAIL_HOST_USER
-            recipient_list = [request.POST.get("email"), ]
-            message = request.POST.get("message")
-            EmailMessage(subject, message, email_from, recipient_list, connection=connection).send()
-        return redirect("blog:home")
+            email = EmailMessage(subject, message, email_from, recipient_list, connection=connection)
+            email.send()
 
-    return render(request, 'contact.html')
+        return redirect("blog:home")

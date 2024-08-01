@@ -76,7 +76,7 @@
                         {% if request.user.is_authenticated %}
                             <form action="{% url 'blog:logout' %}" method="post">
                                 {% csrf_token %}
-                                <a class="btn btn-primary py-2 px-4 ml-auto d-none d-lg-block" href="{% url 'blog:logout' %}">Logout</a>
+                                <a class="btn btn-primary py-2  ml-auto d-none d-lg-block" href="{% url 'blog:logout' %}">Logout</a>
                             </form>
                         {% else %}
                             <a class="btn btn-primary py-2 px-4 ml-auto d-none d-lg-block" href="{% url 'blog:login' %}">Login</a>
