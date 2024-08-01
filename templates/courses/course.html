@@ -83,10 +83,17 @@
             </div>
             <div class="row">
                 {% for co in course %}
+                    <a href="{% url 'course:course-detail' co.id %}">
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="rounded overflow-hidden mb-2">
-                        <img class="img-fluid" src="{{ co.video.url }}" alt="">
-                        <div class="bg-secondary p-4">
+                        <div class="video-card">
+                            <video width="320" height="240" controls>
+                                <source src="{{ co.video.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+
+                            <div class="bg-secondary p-4">
                             <div class="d-flex justify-content-between mb-3">
                                 <small class="m-0"><i class="fa fa-users text-primary mr-2"></i>{{ co.number_of_students }} Students</small>
                                 <small class="m-0"><i class="far fa-clock text-primary mr-2"></i>{{ co.duration }}h</small>
@@ -99,6 +106,8 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
+
                     </div>
                 </div>
                 {% endfor %}
