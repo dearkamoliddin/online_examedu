@@ -59,13 +59,31 @@
 
             <div class="col-md-6 col-lg-4">
                 <div class="video-card">
-                    <video width="320" height="240" controls autoplay>
+                    <video width="100%" height="240" controls autoplay>
                         <source src="{{ course.video.url }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     <div class="video-description">
-                        <p>{{ course.title }}</p>
-                        <small>Duration: {{ course.duration }}</small>
+                        <span style="display: flex; justify-content: space-between">
+                            <h4>Course:</h4>
+                            <h4 style="color: green">{{ course.title }}</h4>
+                        </span>
+
+                            <span style="justify-content: space-between">
+                                <h4>Description: </h4>
+                                <h4 style="color: green">{{ course.description }}</h4>
+                            </span>
+
+                            <span style="display: flex; justify-content: space-between">
+                                <h4>Number of Students: </h4>
+                                <h4 style="color: green">{{ course.number_of_students }}</h4>
+                            </span>
+
+                            <span style="display: flex; justify-content: space-between">
+                                <h4>Price: </h4>
+                                <h4 style="color: green">${{ course.price }}</h4>
+                            </span>
+
                     </div>
                 </div>
             </div>
@@ -79,27 +97,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
-<!---  <div>
-    <span style="display: flex">
-    <h1>Course:</h1>
-    <h1 style="color: green">{{ course.title }}</h1>
-</span>
 
-<span>
-    <h1>Description: </h1>
-    <h3 style="color: green">{{ course.description }}</h3>
-</span>
-
-<span style="display: flex">
-    <h1>Number of Students: </h1>
-    <h1 style="color: green">{{ course.number_of_students }}</h1>
-</span>
-
-<span style="display: flex">
-    <h1>Price: </h1>
-    <h1 style="color: green">${{ course.price }}</h1>
-</span>
-</div> -->
 
 {% include 'layouts/footer.html' %}
 
