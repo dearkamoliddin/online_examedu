@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
@@ -8,6 +9,7 @@ from django.views.generic import TemplateView
 from blog.models import BlogModel
 from course.models import CourseModel, CategoryModel
 from teacher.models import TeacherModel
+from django.core.mail import EmailMessage, get_connection
 
 
 class HomePageView(TemplateView):
@@ -90,3 +92,22 @@ def register_view(request):
             return render(request, 'auth/register.html', context={"message_password": "Passwordlar mos kelmadi"})
 
     return render(request, 'auth/register.html')
+
+
+def send_email(request):
+    if request.method == "POST":
+        with get_connection(
+                host=settings.EMAIL_HOST,
+                port=settings.EMAIL_PORT,
+                username=settings.EMAIL_HOST_USER,
+                password=settings.EMAIL_HOST_PASSWORD,
+                use_tls=settings.EMAIL_USE_TLS
+        ) as connection:
+            subject = request.POST.get("subject")
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [request.POST.get("email"), ]
+            message = request.POST.get("message")
+            EmailMessage(subject, message, email_from, recipient_list, connection=connection).send()
+        return redirect("blog:home")
+
+    return render(request, 'contact.html')
