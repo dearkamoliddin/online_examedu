@@ -1,7 +1,7 @@
 from django.urls import path
 
 from blog.views import HomePageView, AboutView, ContactView, BlogListView, BlogDetailView, login_view, register_view, \
-    send_email, confirmation_view
+    send_email, confirmation_view, logout_view
 
 app_name = 'blog'
 
@@ -16,6 +16,7 @@ urlpatterns = [
     path('register/', register_view, name='register'),
     path('send_email/', send_email, name='send_email'),
     path('confirm/', confirmation_view, name='confirm'),
+    path('logout/', logout_view, name='logout'),
 
 
 ]
