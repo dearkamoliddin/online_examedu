@@ -96,7 +96,7 @@ def send_confirmation_email(email):
 class RegisterView(FormView):
     template_name = 'auth/register.html'
     form_class = RegistrationForm
-    success_url = reverse_lazy('blog:home')
+    success_url = reverse_lazy('blog:confirm')
 
     def form_valid(self, form):
         user = form.save(commit=False)
