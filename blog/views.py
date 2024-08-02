@@ -39,19 +39,30 @@ class HeaderView(TemplateView):
 class AboutView(TemplateView):
     template_name = 'about.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = CategoryModel.objects.all()
+        return context
+
 
 class ContactView(TemplateView):
     template_name = 'contact.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = CategoryModel.objects.all()
+        return context
 
 
 class BlogListView(TemplateView):
     template_name = 'blogs/blog.html'
     model = BlogModel
 
-    def get(self, request, *args, **kwargs):
-        blogs = BlogModel.objects.all()
-        context = {'blogs': blogs}
-        return render(request, 'blogs/blog.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['blog'] = BlogModel.objects.all()
+        context['category'] = CategoryModel.objects.all()
+        return context
 
 
 class BlogDetailView(TemplateView):
